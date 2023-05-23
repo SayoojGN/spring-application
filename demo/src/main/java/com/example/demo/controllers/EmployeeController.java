@@ -5,6 +5,7 @@ import com.example.demo.entities.EmployeeId;
 import com.example.demo.service.impl.EmployeeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +26,23 @@ public class EmployeeController {
         return service.getEmployees();
     }
 
-    @PostMapping("/add")
-    public String addEmployee(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address) {
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    @GetMapping("/{empId}/{companyCode}")
+    public Employee getEmployeesById(@PathVariable("empId") Long empId, @PathVariable("companyCode") Long companyCode){
+        EmployeeId temp2 = new EmployeeId(empId, companyCode);
+        Employee temp = service.getEmployeesById(temp2);
+        temp.setEmiratesIdNo(service.decrypt(temp.getEmiratesIdNo()));
+        return temp;
+    }
+
+    @PostMapping("/add")
+    public String addEmployee(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address) {
+        String encryptedEmiratesIdNo = service.encrypt(emiratesIdNo);
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         Employee temp = Employee.builder()
                 .employeeId(temp2)
+                .emiratesIdNo(encryptedEmiratesIdNo)
                 .address(address)
                 .age(age)
                 .name(name).build();
@@ -41,9 +53,11 @@ public class EmployeeController {
 
     @PostMapping("/add2")
     public String addEmployee2(@RequestBody EmployeeDTO employeeDTO){
+        String encryptedEmiratesIdNo = service.encrypt(employeeDTO.getEmiratesIdNo());
         EmployeeId temp2 = new EmployeeId(employeeDTO.getEmpId(), employeeDTO.getCompanyCode());
         Employee temp = Employee.builder()
                 .employeeId(temp2)
+                .emiratesIdNo(encryptedEmiratesIdNo)
                 .address(employeeDTO.getAddress())
                 .age(employeeDTO.getAge())
                 .name(employeeDTO.getName()).build();
@@ -53,7 +67,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/present")
-    public String addIfNotPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address){
+    public String addIfNotPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address){
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         if(service.searchEmployeeById(temp2))
         {
@@ -65,6 +79,7 @@ public class EmployeeController {
             MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
             map.add("empId", empId);
             map.add("companyCode", companyCode);
+            map.add("emiratesIdNo", service.encrypt(emiratesIdNo));
             map.add("name", name);
             map.add("age", age);
             map.add("address", address);
@@ -82,16 +97,17 @@ public class EmployeeController {
     }
 
     @PutMapping("/update")
-    public String updateIfPresent(@RequestParam("empId") Long empId,@RequestParam("companyCode") Long companyCode,@RequestParam("address") String address, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("updateName") Boolean updateName, @RequestParam("updateAge") Boolean updateAge, @RequestParam("updateAddress") Boolean updateAddress) {
+    public String updateIfPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("address") String address, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("updateEmiratesIdNo") Boolean updateEmiratesIdNo, @RequestParam("updateName") Boolean updateName, @RequestParam("updateAge") Boolean updateAge, @RequestParam("updateAddress") Boolean updateAddress) {
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         Employee temp = Employee.builder()
                 .employeeId(temp2)
+                .emiratesIdNo(service.encrypt(emiratesIdNo))
                 .address(address)
                 .age(age)
                 .name(name).build();
         if(service.searchEmployeeById(temp2))
         {
-            return service.updateEmployee(temp2, temp, updateName, updateAddress, updateAge);
+            return service.updateEmployee(temp2, temp, updateEmiratesIdNo, updateName, updateAddress, updateAge);
         }
         else {
             return "Employee not found";

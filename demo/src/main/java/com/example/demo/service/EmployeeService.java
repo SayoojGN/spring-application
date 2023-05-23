@@ -7,6 +7,11 @@ import java.util.List;
 
 public interface EmployeeService {
 
+    // This method use to encrypt to string
+    String encrypt(String strToEncrypt);
+
+    String decrypt(String strToDecrypt);
+
     List<Employee> getEmployees();
 
     void addEmployees(Employee employee);
@@ -15,5 +20,5 @@ public interface EmployeeService {
 
     boolean searchEmployeeById(EmployeeId e);
 
-    String updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateName, boolean updateAddress, boolean updateAge);
+    String updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateEmiratesIdNo, boolean updateName, boolean updateAddress, boolean updateAge);
 }

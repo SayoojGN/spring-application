@@ -13,6 +13,7 @@ import lombok.*;
 public class Employee {
     @EmbeddedId
     public EmployeeId employeeId;
+    private String emiratesIdNo;
     private String name;
     private Integer age;
     private String address;
