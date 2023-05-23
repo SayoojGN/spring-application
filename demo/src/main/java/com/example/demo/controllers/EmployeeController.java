@@ -81,6 +81,23 @@ public class EmployeeController {
         }
     }
 
+    @PostMapping("/update")
+    public String updateIfPresent(@RequestParam("empId") Long empId,@RequestParam("companyCode") Long companyCode,@RequestParam("address") String address, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("updateName") Boolean updateName, @RequestParam("updateAge") Boolean updateAge, @RequestParam("updateAddress") Boolean updateAddress) {
+        EmployeeId temp2 = new EmployeeId(empId, companyCode);
+        Employee temp = Employee.builder()
+                .employeeId(temp2)
+                .address(address)
+                .age(age)
+                .name(name).build();
+        if(service.searchEmployeeById(temp2))
+        {
+            return service.updateEmployee(temp2, temp, updateName, updateAddress, updateAge);
+        }
+        else {
+            return "Employee not found";
+        }
+    }
+
     @PostMapping("/present1")
     public String addIfNotPresent(@RequestBody EmployeeDTO employeeDTO){
         EmployeeId temp2 = new EmployeeId(employeeDTO.getEmpId(), employeeDTO.getCompanyCode());

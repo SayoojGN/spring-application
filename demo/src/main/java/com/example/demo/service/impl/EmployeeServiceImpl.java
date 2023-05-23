@@ -32,4 +32,32 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public boolean searchEmployeeById(EmployeeId e) { return employeeRepository.existsById(e); }
 
+    @Override
+    public String updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateName, boolean updateAddress, boolean updateAge) {
+        Employee selected = employeeRepository.getReferenceById(employeeId);
+        employeeRepository.delete(selected);
+        Employee tempEmployee = new Employee();
+        tempEmployee.setEmployeeId(employeeId);
+        if(updateName){
+            tempEmployee.setName(newEmployee.getName());
+        }
+        else {
+            tempEmployee.setName(selected.getName());
+        }
+        if(updateAddress){
+            tempEmployee.setAddress(newEmployee.getAddress());
+        }
+        else {
+            tempEmployee.setAddress(selected.getAddress());
+        }
+        if(updateAge){
+            tempEmployee.setAge(newEmployee.getAge());
+        }
+        else{
+            tempEmployee.setAge(selected.getAge());
+        }
+        addEmployees(tempEmployee);
+        return "Employee updated";
+    }
+
 }

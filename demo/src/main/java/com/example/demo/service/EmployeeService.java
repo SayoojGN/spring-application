@@ -14,4 +14,6 @@ public interface EmployeeService {
     void deleteEmployeesById(EmployeeId e);
 
     boolean searchEmployeeById(EmployeeId e);
+
+    String updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateName, boolean updateAddress, boolean updateAge);
 }
