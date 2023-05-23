@@ -81,7 +81,7 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public String updateIfPresent(@RequestParam("empId") Long empId,@RequestParam("companyCode") Long companyCode,@RequestParam("address") String address, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("updateName") Boolean updateName, @RequestParam("updateAge") Boolean updateAge, @RequestParam("updateAddress") Boolean updateAddress) {
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         Employee temp = Employee.builder()
