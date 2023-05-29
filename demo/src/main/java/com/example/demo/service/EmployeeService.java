@@ -20,5 +20,5 @@ public interface EmployeeService {
 
     boolean searchEmployeeById(EmployeeId e);
 
-    String updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateEmiratesIdNo, boolean updateName, boolean updateAddress, boolean updateAge);
+    void updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateEmiratesIdNo, boolean updateName, boolean updateAddress, boolean updateAge);
 }

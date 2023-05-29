@@ -134,7 +134,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public boolean searchEmployeeById(EmployeeId e) { return employeeRepository.existsById(e); }
 
     @Override
-    public String updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateEmiratesIdNo, boolean updateName, boolean updateAddress, boolean updateAge) {
+    public void updateEmployee(EmployeeId employeeId, Employee newEmployee, boolean updateEmiratesIdNo, boolean updateName, boolean updateAddress, boolean updateAge) {
         Employee selected = employeeRepository.getReferenceById(employeeId);
         employeeRepository.delete(selected);
         Employee tempEmployee = new Employee();
@@ -164,7 +164,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             tempEmployee.setAge(selected.getAge());
         }
         addEmployees(tempEmployee);
-        return "Employee updated";
     }
 
 }

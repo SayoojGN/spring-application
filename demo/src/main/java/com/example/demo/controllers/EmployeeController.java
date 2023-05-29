@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.entities.Employee;
 import com.example.demo.entities.EmployeeId;
+import com.example.demo.exception.ApiRequestException;
 import com.example.demo.models.EmployeeDTO;
 import com.example.demo.service.impl.EmployeeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public String addEmployee(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address) {
+    public void addEmployee(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address) {
         String encryptedEmiratesIdNo = service.encrypt(emiratesIdNo);
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         Employee temp = Employee.builder()
@@ -54,11 +55,11 @@ public class EmployeeController {
                 .name(name).build();
 
         service.addEmployees(temp);
-        return "Record added successfully";
+        throw new ApiRequestException("Employee added");
     }
 
     @PostMapping("/add2")
-    public String addEmployee2(@RequestBody EmployeeDTO employeeDTO){
+    public void addEmployee2(@RequestBody EmployeeDTO employeeDTO){
         String encryptedEmiratesIdNo = service.encrypt(employeeDTO.getEmiratesIdNo());
         EmployeeId temp2 = new EmployeeId(employeeDTO.getEmpId(), employeeDTO.getCompanyCode());
         Employee temp = Employee.builder()
@@ -69,15 +70,15 @@ public class EmployeeController {
                 .name(employeeDTO.getName()).build();
 
         service.addEmployees(temp);
-        return "Record added successfully";
+        throw new ApiRequestException("Employee added");
     }
 
     @PostMapping("/present")
-    public String addIfNotPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address){
+    public void addIfNotPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("address") String address){
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         if(service.searchEmployeeById(temp2))
         {
-            return "Employee already present";
+            throw new ApiRequestException("Employee already exists");
         }
         else {
             HttpHeaders httpHeaders = new HttpHeaders();
@@ -93,17 +94,17 @@ public class EmployeeController {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map , httpHeaders);
             RestTemplate restTemplate = new RestTemplate();
 
-            String result = restTemplate.postForObject("http://localhost:8080/add",
+            String result = restTemplate.postForObject("http://localhost:8080/swagger-ui/index.html/add",
                     requestEntity,
                     String.class);
 
             System.out.println(result);
-            return "Employee added";
+            throw new ApiRequestException("Employee added");
         }
     }
 
     @PutMapping("/update")
-    public String updateIfPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("address") String address, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("updateEmiratesIdNo") Boolean updateEmiratesIdNo, @RequestParam("updateName") Boolean updateName, @RequestParam("updateAge") Boolean updateAge, @RequestParam("updateAddress") Boolean updateAddress) {
+    public void updateIfPresent(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode, @RequestParam("emiratesIdNo") String emiratesIdNo, @RequestParam("address") String address, @RequestParam("name") String name, @RequestParam("age") Integer age, @RequestParam("updateEmiratesIdNo") Boolean updateEmiratesIdNo, @RequestParam("updateName") Boolean updateName, @RequestParam("updateAge") Boolean updateAge, @RequestParam("updateAddress") Boolean updateAddress) {
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
         Employee temp = Employee.builder()
                 .employeeId(temp2)
@@ -111,21 +112,20 @@ public class EmployeeController {
                 .address(address)
                 .age(age)
                 .name(name).build();
-        if(service.searchEmployeeById(temp2))
-        {
-            return service.updateEmployee(temp2, temp, updateEmiratesIdNo, updateName, updateAddress, updateAge);
-        }
-        else {
-            return "Employee not found";
+        if(service.searchEmployeeById(temp2)) {
+            service.updateEmployee(temp2, temp, updateEmiratesIdNo, updateName, updateAddress, updateAge);
+            throw new ApiRequestException("Employee updated");
+        } else {
+            throw new ApiRequestException("Employee not found");
         }
     }
 
     @PostMapping("/present1")
-    public String addIfNotPresent(@RequestBody EmployeeDTO employeeDTO){
+    public void addIfNotPresent(@RequestBody EmployeeDTO employeeDTO){
         EmployeeId temp2 = new EmployeeId(employeeDTO.getEmpId(), employeeDTO.getCompanyCode());
         if(service.searchEmployeeById(temp2))
         {
-            return "Employee already present";
+            throw new ApiRequestException("Employee already exists");
         }
         else {
             HttpHeaders httpHeaders = new HttpHeaders();
@@ -133,36 +133,34 @@ public class EmployeeController {
 
             HttpEntity<EmployeeDTO> requestEntity = new HttpEntity<>(employeeDTO, httpHeaders);
             RestTemplate restTemplate = new RestTemplate();
-            String result = restTemplate.postForObject("http://localhost:8080/add2",
+            String result = restTemplate.postForObject("http://localhost:8080/swagger-ui/index.html/add2",
                     requestEntity,
                     String.class);
-
-            System.out.println(result);
-            return "Employee added";
+            throw new ApiRequestException("Employee added");
         }
     }
 
     @DeleteMapping("/delete")
-    public String deleteEmployees(@RequestBody EmployeeDTO e) {
+    public void deleteEmployees(@RequestBody EmployeeDTO e) {
         EmployeeId temp = new EmployeeId();
         temp.setEmpId(e.getEmpId());
         temp.setCompanyCode(e.getCompanyCode());
         service.deleteEmployeesById(temp);
-        return "Deleted Successfully";
+        throw new ApiRequestException("Employee deleted");
     }
 
     @DeleteMapping("/delete2")
-    public String deleteEmployees(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode){
+    public void deleteEmployees(@RequestParam("empId") Long empId, @RequestParam("companyCode") Long companyCode){
         EmployeeId temp = new EmployeeId(empId, companyCode);
         service.deleteEmployeesById(temp);
-        return "Delete Successfully";
+        throw new ApiRequestException("Employee deleted");
     }
 
     @DeleteMapping("/{empId}/{companyCode}")
-    public String deleteEmployees2(@PathVariable("empId") Long empId, @PathVariable("companyCode") Long companyCode) {
+    public void deleteEmployees2(@PathVariable("empId") Long empId, @PathVariable("companyCode") Long companyCode) {
         EmployeeId temp = new EmployeeId(empId, companyCode);
         service.deleteEmployeesById(temp);
-        return "Delete Successful";
+        throw new ApiRequestException("Employee deleted");
     }
 
 }
