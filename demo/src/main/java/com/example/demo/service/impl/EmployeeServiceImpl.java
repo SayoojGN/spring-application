@@ -5,6 +5,8 @@ import com.example.demo.entities.EmployeeId;
 import com.example.demo.EmployeeRepository;
 import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -114,11 +116,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Override
+    @Cacheable(value = "employeeInfo")
     public List<Employee> getEmployees(){
         return employeeRepository.findAll();
     }
 
-    public Employee getEmployeesById(EmployeeId employeeId) {return employeeRepository.findById(employeeId).get();}
+    @Override
+    @CachePut(value = "employeeInfo")
+    public Employee getEmployeesById(EmployeeId employeeId) {
+        return employeeRepository.findById(employeeId).get();
+    }
 
     @Override
     public void addEmployees(Employee employee){

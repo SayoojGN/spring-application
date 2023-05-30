@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-@RequestMapping("/swagger-ui/index.html")
+@RequestMapping("/")
 @RestController
 public class EmployeeController {
     @Autowired
