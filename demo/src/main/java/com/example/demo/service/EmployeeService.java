@@ -14,8 +14,7 @@ public interface EmployeeService {
     String decrypt(String strToDecrypt);
 
     List<Employee> getEmployees();
-
-    @CachePut(value = "employeeInfo")
+    
     Employee getEmployeesById(EmployeeId employeeId);
 
     void addEmployees(Employee employee);
