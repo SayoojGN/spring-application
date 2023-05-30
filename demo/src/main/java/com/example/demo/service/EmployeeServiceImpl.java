@@ -1,9 +1,8 @@
-package com.example.demo.service.impl;
+package com.example.demo.service;
 
 import com.example.demo.entities.Employee;
 import com.example.demo.entities.EmployeeId;
 import com.example.demo.EmployeeRepository;
-import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +20,7 @@ import java.util.Base64;
 import java.util.List;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
+public class EmployeeServiceImpl implements EmployeeService1 {
 
     private static final String SECRET_KEY
             = "my_super_secret_key_ho_ho_ho";

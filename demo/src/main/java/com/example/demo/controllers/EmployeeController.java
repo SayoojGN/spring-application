@@ -4,7 +4,8 @@ import com.example.demo.entities.Employee;
 import com.example.demo.entities.EmployeeId;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.models.EmployeeDTO;
-import com.example.demo.service.impl.EmployeeServiceImpl;
+import com.example.demo.service.EmployeeService1;
+import com.example.demo.service.EmployeeService2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +16,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RequestMapping("/")
 @RestController
 public class EmployeeController {
+
     @Autowired
-    private EmployeeServiceImpl service;
+    private EmployeeService1 service;
+
+    @Autowired
+    private EmployeeService2 service2;
 
     @GetMapping("/")
     public List<Employee> getEmployee() {
@@ -36,11 +42,14 @@ public class EmployeeController {
     }
 
     @GetMapping("/{empId}/{companyCode}")
-    public Employee getEmployeesById1(@PathVariable("empId") Long empId, @PathVariable("companyCode") Long companyCode){
+    public void getEmployeesById1(@PathVariable("empId") Long empId, @PathVariable("companyCode") Long companyCode) throws ExecutionException, InterruptedException {
         EmployeeId temp2 = new EmployeeId(empId, companyCode);
-        Employee temp = service.getEmployeesById(temp2);
-        temp.setEmiratesIdNo(service.decrypt(temp.getEmiratesIdNo()));
-        return temp;
+        Thread t = Thread.currentThread();
+        System.out.println(t.getId());
+        // testing out @Async making 3 threads
+        service2.getAgeOfEmpId(temp2);
+        service2.getAddressOfEmpId(temp2);
+        service2.getNameOfEmpId(temp2).get();
     }
 
     @PostMapping("/add")
